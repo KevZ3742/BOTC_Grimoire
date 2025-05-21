@@ -5,7 +5,7 @@ A companion tool for the social deduction game *Blood on the Clocktower*. This g
 ## Features
 
 - **Role Generator**: Randomly assign roles to players, ensuring a balanced and fair game setup.
-- **Match History**: Keep track of past games, including roles, outcomes, and player performance.
+- **Match History**: Keep track of past games, including roles and outcomes.
 - **Player Lookup**: Quickly access player stats, preferences, and past roles for better game management.
 
 ## Usage
