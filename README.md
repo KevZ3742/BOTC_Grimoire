@@ -8,6 +8,10 @@ A companion tool for the social deduction game *Blood on the Clocktower*. This g
 - **Match History**: Keep track of past games, including roles and outcomes.
 - **Player Lookup**: Quickly access player stats, preferences, and past roles for better game management.
 
+## Scripts
+
+- Trouble Brewing
+
 ## Usage
 
 1. Launch the application.
