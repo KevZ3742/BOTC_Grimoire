@@ -1,6 +1,16 @@
-Blood on the Clock Tower Grimoire
+# Blood on the Clock Tower Grimoire
 
-Features:
-- Role Generator
-- Match History
-- Player Lookup
+A companion tool for the social deduction game *Blood on the Clocktower*. This grimoire helps storytellers and players manage their games with ease.
+
+## Features
+
+- **Role Generator**: Randomly assign roles to players, ensuring a balanced and fair game setup.
+- **Match History**: Keep track of past games, including roles, outcomes, and player performance.
+- **Player Lookup**: Quickly access player stats, preferences, and past roles for better game management.
+
+## Usage
+
+1. Launch the application.
+2. Use the **Role Generator** to assign roles to players.
+3. Record game details in **Match History** for future reference.
+4. Use **Player Lookup** to view player stats and history.
