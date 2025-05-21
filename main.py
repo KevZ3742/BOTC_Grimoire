@@ -3,9 +3,8 @@ from tkinter import ttk, messagebox
 import random
 import csv
 import os
-import time  # For timestamp
-import uuid  # For unique IDs
-from scripts import scripts  # Make sure your 'scripts' is correctly imported and accessible
+import time
+from scripts import scripts
 
 MATCH_HISTORY_FILE = "match_history.csv"
 
