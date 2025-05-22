@@ -158,11 +158,12 @@ def generate_roles():
         return
 
     # We'll generate roles to check if Baron is in the pool later:
+
+    init_minions = random.sample(roles["Minion"], minions)
     role_pool_full = (
         random.sample(roles["Townsfolk"], townsfolk) +
         random.sample(roles["Outsider"], outsiders) +
-        random.sample(roles["Minion"], minions) +
-        random.sample(roles["Demon"], demons)
+        random.sample(roles["Demon"], demons) + init_minions
     )
 
     # Adjust for Baron role if present in script or role_pool_full
@@ -173,18 +174,27 @@ def generate_roles():
         outsiders += 2
         if townsfolk < 0:
             townsfolk = 0  # Don't allow negative
+    if "Godfather" in role_pool_full:
+        # Baron adjustment: +2 Outsiders, -2 Townsfolk
+        if random.randint(0, 1) == 0:
+            townsfolk -= 1
+            outsiders += 1
+        else:
+            townsfolk += 1
+            outsiders -= 1
+        if townsfolk < 0:
+            townsfolk = 0  # Don't allow negative
 
     # Now sample final roles again with adjusted counts
     try:
         final_townsfolk = random.sample(roles["Townsfolk"], townsfolk)
         final_outsiders = random.sample(roles["Outsider"], outsiders)
-        final_minions = random.sample(roles["Minion"], minions)
         final_demons = random.sample(roles["Demon"], demons)
     except ValueError as e:
         messagebox.showerror("Role Sampling Error", f"Not enough roles to sample: {e}")
         return
 
-    role_pool = final_townsfolk + final_outsiders + final_minions + final_demons
+    role_pool = final_townsfolk + final_outsiders + init_minions + final_demons
     random.shuffle(role_pool)
 
     traveler_roles = roles.get("Traveler", [])[:]
