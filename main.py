@@ -40,11 +40,12 @@ role_distribution = {
 }
 
 STATUS_OPTIONS = {
-    "Dead": "#000000",        # black
-    "Poisoned": "#800080",    # purple
-    "Drunk": "#006400",       # dark green
-    "Mad": "#FF69B4",         # pink
-    "Protected": "#FFD700",   # gold
+    # Format: {"status": {"bg": color, "fg": color}}
+    "Dead": {"bg": "#000000", "fg": "white"},
+    "Poisoned": {"bg": "#800080", "fg": "white"},
+    "Drunk": {"bg": "#006400", "fg": "white"},
+    "Mad": {"bg": "#FF69B4", "fg": "black"},
+    "Protected": {"bg": "#FFD700", "fg": "black"},
 }
 
 root = tk.Tk()
@@ -212,12 +213,13 @@ def create_player_rows():
             def update_tag_display(self):
                 for widget in self.frame.winfo_children():
                     widget.destroy()
+                
                 for status in self.label.active_tags:
-                    color = STATUS_OPTIONS.get(status, "#CCCCCC")
+                    colors = STATUS_OPTIONS.get(status, {"bg": "#CCCCCC", "fg": "black"})
                     square = tk.Label(
                         self.frame,
-                        bg=color,
-                        fg="black",
+                        bg=colors["bg"],
+                        fg=colors["fg"],
                         text=status,
                         width=max(7, len(status)),
                         height=1,
@@ -237,13 +239,13 @@ def create_player_rows():
         context = StatusContext(tag_label, tag_squares_frame, tk.Menu(root, tearoff=0))
 
         # Add status options to the menu
-        for idx, (status, color) in enumerate(STATUS_OPTIONS.items()):
+        for idx, (status, colors) in enumerate(STATUS_OPTIONS.items()):
             context.menu.add_command(
                 label=f"\u25A0 {status}",
                 command=context.make_toggle_command(status)
             )
-            context.menu.entryconfig(idx, foreground=color)
-            context.menu_indices.append((idx, status, color))
+            context.menu.entryconfig(idx, foreground=colors["bg"])
+            context.menu_indices.append((idx, status, colors["bg"]))
 
         context.menu.add_separator()
         context.menu.add_command(
