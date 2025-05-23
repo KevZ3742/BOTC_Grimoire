@@ -11,6 +11,7 @@ A companion tool for the social deduction game *Blood on the Clocktower*. This g
 ## Scripts
 
 - Trouble Brewing
+- Bad Moon Rising (Work in Progress)
 
 ## Usage
 
