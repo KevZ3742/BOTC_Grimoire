@@ -6,6 +6,7 @@ import os
 import time
 from scripts import scripts
 
+# Constants
 MATCH_HISTORY_FILE = "match_history.csv"
 
 MIN_PLAYERS = 5
@@ -35,6 +36,17 @@ role_distribution = {
     13: (9, 0, 3, 1),
     14: (9, 1, 3, 1),
     15: (9, 2, 3, 1),
+}
+
+STATUS_OPTIONS = {
+    "dead": "#000000",  # black
+    "poisoned": "#7CFC00",  # green
+    "drunk": "#FFD700",  # gold
+    "mad": "#FF69B4",  # pink
+    "perceived": "#4682B4",  # steel blue
+    "marked": "#FF4500",  # orange red
+    "protected": "#90EE90",  # light green
+    "stunned": "#D3D3D3",  # light gray
 }
 
 root = tk.Tk()
@@ -101,9 +113,12 @@ def color_class_label(label, role_type):
     label.config(background=color, foreground=fg_color)
 
 def create_player_rows():
+    # Clear existing rows
     for widget in player_table_frame.winfo_children():
         widget.destroy()
     player_rows.clear()
+    
+    # Validate input
     try:
         num_players = int(player_count_var.get())
         num_travelers = int(traveler_count_var.get())
@@ -112,28 +127,109 @@ def create_player_rows():
         if num_players + num_travelers > MAX_PLAYERS:
             raise ValueError
     except ValueError:
-        messagebox.showerror("Invalid Input", "Players: 5–15, Travelers: 0–5, Total ≤ 20")
+        messagebox.showerror("Invalid Input", "Players: 5-15, Travelers: 0-5, Total ≤ 20")
         return
+    
     create_prompt_label.pack_forget()
-    headers = ["Class", "Username", "Role"]
+    
+    # Create column headers
+    headers = ["Class", "Username", "Role", "Status Tags"]
     for col, text in enumerate(headers):
-        ttk.Label(player_table_frame, text=text, font=('Arial', 10, 'bold')).grid(row=0, column=col, padx=5, pady=5)
+        header = ttk.Label(player_table_frame, 
+                         text=text, 
+                         font=('Arial', 10, 'bold'),
+                         borderwidth=1,
+                         relief="solid")
+        header.grid(row=0, column=col, padx=5, pady=5, sticky="nsew")
+    
+    # Configure column weights
+    for col in range(len(headers)):
+        player_table_frame.columnconfigure(col, weight=1)
+    
+    # Create player rows
     for i in range(num_players + num_travelers):
         is_traveler = i >= num_players
-        class_lbl = tk.Label(player_table_frame, text="Traveler" if is_traveler else "Resident", width=10)
-        class_lbl.grid(row=i+1, column=0, padx=5, pady=2)
+        
+        # Class Label
+        class_lbl = tk.Label(player_table_frame,
+                           text="Traveler" if is_traveler else "Resident",
+                           width=10,
+                           borderwidth=1,
+                           relief="solid")
+        class_lbl.grid(row=i+1, column=0, padx=5, pady=2, sticky="nsew")
+        
+        # Username Entry
         username_entry = ttk.Entry(player_table_frame)
-        username_entry.grid(row=i+1, column=1, padx=5, pady=2)
-        role_lbl = ttk.Label(player_table_frame, text="TBD")
-        role_lbl.grid(row=i+1, column=2, padx=5, pady=2)
+        username_entry.grid(row=i+1, column=1, padx=5, pady=2, sticky="nsew")
+        
+        # Role Label
+        role_lbl = ttk.Label(player_table_frame,
+                           text="TBD",
+                           borderwidth=1,
+                           relief="solid")
+        role_lbl.grid(row=i+1, column=2, padx=5, pady=2, sticky="nsew")
+        
+        # Status Tag Cell
+        tag_frame = tk.Frame(player_table_frame,
+                           borderwidth=1,
+                           relief="solid")
+        tag_frame.grid(row=i+1, column=3, padx=5, pady=2, sticky="nsew")
+        tag_frame.grid_propagate(False)  # Prevent frame from resizing to content
+        
+        tag_label = tk.Label(tag_frame,
+                           text="",
+                           width=15,
+                           height=2)
+        tag_label.pack(expand=True, fill="both")
+        tag_label.active_tags = set()  # Initialize empty status set
+        
+        # Right-click menu for status tags
+        status_menu = tk.Menu(root, tearoff=0)
+        for status in STATUS_OPTIONS.keys():
+            status_menu.add_command(
+                label=f"Toggle {status}",
+                command=lambda s=status, lbl=tag_label: toggle_status_tag(lbl, s)
+            )
+        status_menu.add_separator()
+        status_menu.add_command(
+            label="Clear all statuses",
+            command=lambda lbl=tag_label: clear_status_tags(lbl)
+        )
+        
+        # Bind right-click to menu
+        tag_label.bind("<Button-3>", lambda e, m=status_menu: m.post(e.x_root, e.y_root))
+        
+        # Visual feedback on hover
+        tag_label.bind("<Enter>", lambda e, lbl=tag_label: lbl.config(relief="groove"))
+        tag_label.bind("<Leave>", lambda e, lbl=tag_label: lbl.config(relief="flat"))
+        
         player_rows.append({
             "username_entry": username_entry,
             "role_label": role_lbl,
             "class_label": class_lbl,
+            "tag_label": tag_label,
             "is_traveler": is_traveler
         })
 
 create_btn.config(command=create_player_rows)
+
+def toggle_status_tag(label, status):
+    if status in label.active_tags:
+        label.active_tags.remove(status)
+    else:
+        label.active_tags.add(status)
+    update_tag_display(label)
+
+def clear_status_tags(label):
+    label.active_tags.clear()
+    update_tag_display(label)
+
+def update_tag_display(label):
+    if not label.active_tags:
+        label.config(text="")
+        return
+    
+    label.config(text=", ".join(label.active_tags))
 
 # --- Generate Roles ---
 def generate_roles():
