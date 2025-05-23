@@ -98,7 +98,7 @@ info_frame.grid(row=0, column=1, padx=10)
 create_prompt_label = ttk.Label(info_frame, text="Create rows first", foreground="gray", anchor="center")
 create_prompt_label.pack(fill='x', pady=20)
 
-bluff_frame = ttk.LabelFrame(main_frame, text="Bluff Roles for Imp")
+bluff_frame = ttk.LabelFrame(main_frame, text="Bluff Roles for Demon")
 bluff_frame.grid(row=0, column=2, padx=10)
 bluff_labels = [ttk.Label(bluff_frame, text=f"Bluff {i+1}: TBD", anchor="center") for i in range(3)]
 for lbl in bluff_labels:
@@ -171,15 +171,15 @@ def create_player_rows():
         
         # Status Tag Cell
         tag_frame = tk.Frame(player_table_frame,
-                           borderwidth=1,
-                           relief="solid")
+                   borderwidth=1,
+                   relief="solid")
         tag_frame.grid(row=i+1, column=3, padx=5, pady=2, sticky="nsew")
-        tag_frame.grid_propagate(False)  # Prevent frame from resizing to content
+        tag_frame.grid_propagate(True)  # Allow frame to resize to content
         
         tag_label = tk.Label(tag_frame,
-                           text="",
-                           width=15,
-                           height=2)
+                   text="",
+                   anchor="w",  # Left align for better text fit
+                   padx=5, pady=2)
         tag_label.pack(expand=True, fill="both")
         tag_label.active_tags = set()  # Initialize empty status set
         
@@ -187,8 +187,8 @@ def create_player_rows():
         status_menu = tk.Menu(root, tearoff=0)
         for status in STATUS_OPTIONS.keys():
             status_menu.add_command(
-                label=f"Toggle {status}",
-                command=lambda s=status, lbl=tag_label: toggle_status_tag(lbl, s)
+            label=f"Toggle {status}",
+            command=lambda s=status, lbl=tag_label: toggle_status_tag(lbl, s)
             )
         status_menu.add_separator()
         status_menu.add_command(
@@ -198,7 +198,6 @@ def create_player_rows():
         
         # Bind right-click to menu
         tag_label.bind("<Button-3>", lambda e, m=status_menu: m.post(e.x_root, e.y_root))
-        
         # Visual feedback on hover
         tag_label.bind("<Enter>", lambda e, lbl=tag_label: lbl.config(relief="groove"))
         tag_label.bind("<Leave>", lambda e, lbl=tag_label: lbl.config(relief="flat"))
