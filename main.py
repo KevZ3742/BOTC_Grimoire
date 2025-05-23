@@ -5,6 +5,7 @@ import csv
 import os
 import time
 from scripts import scripts
+import types
 
 # Constants
 MATCH_HISTORY_FILE = "match_history.csv"
@@ -39,14 +40,11 @@ role_distribution = {
 }
 
 STATUS_OPTIONS = {
-    "dead": "#000000",  # black
-    "poisoned": "#7CFC00",  # green
-    "drunk": "#FFD700",  # gold
-    "mad": "#FF69B4",  # pink
-    "perceived": "#4682B4",  # steel blue
-    "marked": "#FF4500",  # orange red
-    "protected": "#90EE90",  # light green
-    "stunned": "#D3D3D3",  # light gray
+    "Dead": "#000000",        # black
+    "Poisoned": "#800080",    # purple
+    "Drunk": "#006400",       # dark green
+    "Mad": "#FF69B4",         # pink
+    "Protected": "#FFD700",   # gold
 }
 
 root = tk.Tk()
@@ -171,45 +169,107 @@ def create_player_rows():
         
         # Status Tag Cell
         tag_frame = tk.Frame(player_table_frame,
-                   borderwidth=1,
-                   relief="solid")
+               borderwidth=1,
+               relief="solid")
         tag_frame.grid(row=i+1, column=3, padx=5, pady=2, sticky="nsew")
-        tag_frame.grid_propagate(True)  # Allow frame to resize to content
-        
-        tag_label = tk.Label(tag_frame,
-                   text="",
-                   anchor="w",  # Left align for better text fit
-                   padx=5, pady=2)
-        tag_label.pack(expand=True, fill="both")
-        tag_label.active_tags = set()  # Initialize empty status set
-        
-        # Right-click menu for status tags
-        status_menu = tk.Menu(root, tearoff=0)
-        for status in STATUS_OPTIONS.keys():
-            status_menu.add_command(
-            label=f"Toggle {status}",
-            command=lambda s=status, lbl=tag_label: toggle_status_tag(lbl, s)
+        tag_frame.grid_propagate(True)
+
+        # Frame to hold colored squares
+        tag_squares_frame = tk.Frame(tag_frame)
+        tag_squares_frame.pack(expand=True, fill="both")
+
+        tag_label = tk.Label(tag_frame, text="", anchor="w", padx=0, pady=0)
+        tag_label.active_tags = set()
+
+        # Create a context object to hold our references
+        class StatusContext:
+            def __init__(self, label, frame, menu):
+                self.label = label
+                self.frame = frame
+                self.menu = menu
+                self.menu_indices = []
+                
+            def make_toggle_command(self, status):
+                def cmd():
+                    toggle_status_tag(self.label, status)
+                    self.update_tag_display()
+                    self.update_menu_checks()
+                return cmd
+                
+            def clear_command(self):
+                def cmd():
+                    clear_status_tags(self.label)
+                    self.update_tag_display()
+                    self.update_menu_checks()
+                return cmd
+                
+            def update_menu_checks(self):
+                for idx, status, color in self.menu_indices:
+                    checked = status in self.label.active_tags
+                    check = "✓ " if checked else ""
+                    self.menu.entryconfig(idx, label=f"{check}\u25A0 {status}", foreground=color)
+                    
+            def update_tag_display(self):
+                for widget in self.frame.winfo_children():
+                    widget.destroy()
+                for status in self.label.active_tags:
+                    color = STATUS_OPTIONS.get(status, "#CCCCCC")
+                    square = tk.Label(
+                        self.frame,
+                        bg=color,
+                        fg="black",
+                        text=status,
+                        width=max(7, len(status)),
+                        height=1,
+                        relief="ridge",
+                        borderwidth=1,
+                        font=("Arial", 9, "bold")
+                    )
+                    square.pack(side="left", padx=2, pady=1)
+                    square.bind("<Button-3>", self.show_menu)
+                self.label.config(text="")
+                
+            def show_menu(self, event=None):
+                self.update_menu_checks()
+                self.menu.post(event.x_root, event.y_root)
+
+        # Create the context with our current widgets
+        context = StatusContext(tag_label, tag_squares_frame, tk.Menu(root, tearoff=0))
+
+        # Add status options to the menu
+        for idx, (status, color) in enumerate(STATUS_OPTIONS.items()):
+            context.menu.add_command(
+                label=f"\u25A0 {status}",
+                command=context.make_toggle_command(status)
             )
-        status_menu.add_separator()
-        status_menu.add_command(
+            context.menu.entryconfig(idx, foreground=color)
+            context.menu_indices.append((idx, status, color))
+
+        context.menu.add_separator()
+        context.menu.add_command(
             label="Clear all statuses",
-            command=lambda lbl=tag_label: clear_status_tags(lbl)
+            command=context.clear_command()
         )
-        
-        # Bind right-click to menu
-        tag_label.bind("<Button-3>", lambda e, m=status_menu: m.post(e.x_root, e.y_root))
+
+        # Bind right-click to show menu
+        tag_frame.bind("<Button-3>", context.show_menu)
+        tag_squares_frame.bind("<Button-3>", context.show_menu)
+
         # Visual feedback on hover
-        tag_label.bind("<Enter>", lambda e, lbl=tag_label: lbl.config(relief="groove"))
-        tag_label.bind("<Leave>", lambda e, lbl=tag_label: lbl.config(relief="flat"))
-        
+        tag_frame.bind("<Enter>", lambda _: tag_frame.config(relief="groove"))
+        tag_frame.bind("<Leave>", lambda _: tag_frame.config(relief="solid"))
+
+        # Store the update method
+        tag_label.update_tag_display = context.update_tag_display
+
         player_rows.append({
             "username_entry": username_entry,
             "role_label": role_lbl,
             "class_label": class_lbl,
             "tag_label": tag_label,
-            "is_traveler": is_traveler
+            "is_traveler": is_traveler,
+            "tag_squares_frame": tag_squares_frame
         })
-
 create_btn.config(command=create_player_rows)
 
 def toggle_status_tag(label, status):
