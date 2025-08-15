@@ -39,32 +39,59 @@
 1747838539|Demon|Nico|Trouble Brewing,Townsfolk,Michael,Fortune Teller,Loss
 1747838539|Demon|Nico|Trouble Brewing,Townsfolk,Minh,Ravenkeeper,Loss
 1747838539|Demon|Nico|Trouble Brewing,Outsider,Will,Drunk,Loss
-1747883410|Townsfolk|Nico|Bad Moon Rising,Townsfolk,Jojo,Professor
-1747883410|Townsfolk|Nico|Bad Moon Rising,Townsfolk,KevZ3742,Sailor
-1747883410|Townsfolk|Nico|Bad Moon Rising,Minion,Kyler,Assassin
-1747883410|Townsfolk|Nico|Bad Moon Rising,Demon,Kenny,Pukka
-1747883410|Townsfolk|Nico|Bad Moon Rising,Townsfolk,Kael,Fool
-1747883410|Townsfolk|Nico|Bad Moon Rising,Townsfolk,Jonah,Pacifist
-1747883410|Townsfolk|Nico|Bad Moon Rising,Townsfolk,Michael,Tea Lady
-1747887349|Demon|Jonah|Bad Moon Rising,Demon,Minh,Zombuul
-1747887349|Demon|Jonah|Bad Moon Rising,Outsider,Nico,Drunk
-1747887349|Demon|Jonah|Bad Moon Rising,Townsfolk,Kyler,Tea Lady
-1747887349|Demon|Jonah|Bad Moon Rising,Townsfolk,Kenny,Minstrel
-1747887349|Demon|Jonah|Bad Moon Rising,Townsfolk,Kevin,Courtier
-1747887349|Demon|Jonah|Bad Moon Rising,Townsfolk,Kael,Pacifist
-1747887349|Demon|Jonah|Bad Moon Rising,Outsider,Jojo,Goon
-1747887349|Demon|Jonah|Bad Moon Rising,Minion,Michael,Godfather
-1747893127|Townsfolk|Jonah|Bad Moon Rising,Townsfolk,Minh,Pacifist
-1747893127|Townsfolk|Jonah|Bad Moon Rising,Townsfolk,Kyler,Innkeeper
-1747893127|Townsfolk|Jonah|Bad Moon Rising,Townsfolk,Kenny,Courtier
-1747893127|Townsfolk|Jonah|Bad Moon Rising,Minion,Kevin,Devil's Advocate
-1747893127|Townsfolk|Jonah|Bad Moon Rising,Demon,Kael,Shabaloth
-1747893127|Townsfolk|Jonah|Bad Moon Rising,Townsfolk,Jojo,Gambler
-1747893127|Townsfolk|Jonah|Bad Moon Rising,Townsfolk,Michael,Professor
-1747894615|Townsfolk|Jonah|Trouble Brewing,Townsfolk,Minh,Librarian
-1747894615|Townsfolk|Jonah|Trouble Brewing,Townsfolk,Kyler,Virgin
-1747894615|Townsfolk|Jonah|Trouble Brewing,Townsfolk,Kenny,Fortune Teller
-1747894615|Townsfolk|Jonah|Trouble Brewing,Townsfolk,Kevin,Washerwoman
-1747894615|Townsfolk|Jonah|Trouble Brewing,Demon,Kael,Imp
-1747894615|Townsfolk|Jonah|Trouble Brewing,Minion,Jojo,Scarlet Woman
-1747894615|Townsfolk|Jonah|Trouble Brewing,Townsfolk,Michael,Monk
+1755218944|Townsfolk|KevZ3742|Trouble Brewing,Outsider,Kyler,Drunk,Win
+1755218944|Townsfolk|KevZ3742|Trouble Brewing,Minion,KevZ3742,Baron,Loss
+1755218944|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Jojo,Washerwoman,Win
+1755218944|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Jonah,Empath,Win
+1755218944|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Minh,Monk,Win
+1755218944|Townsfolk|KevZ3742|Trouble Brewing,Outsider,Jonathan,Butler,Win
+1755218944|Townsfolk|KevZ3742|Trouble Brewing,Demon,Kael,Imp,Loss
+1755221760|Demon|KevZ3742|Trouble Brewing,Townsfolk,Kyler,Soldier,Loss
+1755221760|Demon|KevZ3742|Trouble Brewing,Townsfolk,Michael,Undertaker,Loss
+1755221760|Demon|KevZ3742|Trouble Brewing,Minion,Jojo,Spy,Win
+1755221760|Demon|KevZ3742|Trouble Brewing,Demon,Jonah,Imp,Win
+1755221760|Demon|KevZ3742|Trouble Brewing,Townsfolk,Minh,Librarian,Loss
+1755221760|Demon|KevZ3742|Trouble Brewing,Townsfolk,Jonathan,Virgin,Loss
+1755221760|Demon|KevZ3742|Trouble Brewing,Townsfolk,Kael,Ravenkeeper,Loss
+1755223422|Townsfolk|Michael|Trouble Brewing,Townsfolk,KevZ3742,Drunk,Win
+1755223422|Townsfolk|Michael|Trouble Brewing,Demon,Kyler,Imp,Loss
+1755223422|Townsfolk|Michael|Trouble Brewing,Townsfolk,Jojo,Empath,Win
+1755223422|Townsfolk|Michael|Trouble Brewing,Townsfolk,Jonah,Ravenkeeper,Win
+1755223422|Townsfolk|Michael|Trouble Brewing,Outsider,Minh,Saint,Win
+1755223422|Townsfolk|Michael|Trouble Brewing,Minion,Jonathan,Baron,Loss
+1755223422|Townsfolk|Michael|Trouble Brewing,Outsider,Kael,Drunk,Win
+1755225801|Townsfolk|KevZ3742|Trouble Brewing,Outsider,Michael,Recluse,Win
+1755225801|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Will,Slayer,Win
+1755225801|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Kyler,Ravenkeeper,Win
+1755225801|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Jojo,Monk,Win
+1755225801|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Jonah,Undertaker,Win
+1755225801|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Minh,Empath,Win
+1755225801|Townsfolk|KevZ3742|Trouble Brewing,Demon,Jonathan,Imp,Loss
+1755225801|Townsfolk|KevZ3742|Trouble Brewing,Minion,Kael,Scarlet Woman,Loss
+1755227883|Townsfolk|Michael|Trouble Brewing,Outsider,KevZ3742,Drunk,Win
+1755227883|Townsfolk|Michael|Trouble Brewing,Townsfolk,Will,Drunk,Win
+1755227883|Townsfolk|Michael|Trouble Brewing,Outsider,Kyler,Drunk,Win
+1755227883|Townsfolk|Michael|Trouble Brewing,Demon,Jojo,Drunk,Loss
+1755227883|Townsfolk|Michael|Trouble Brewing,Outsider,Kenny,Butler,Win
+1755227883|Townsfolk|Michael|Trouble Brewing,Minion,Jonah,Drunk,Loss
+1755227883|Townsfolk|Michael|Trouble Brewing,Townsfolk,Minh,Drunk,Win
+1755227883|Townsfolk|Michael|Trouble Brewing,Townsfolk,Jonathan,Drunk,Win
+1755227883|Townsfolk|Michael|Trouble Brewing,Outsider,Kael,Drunk,Win
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Michael,Drunk,Win
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Minion,Will,Poisoner,Loss
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Outsider,Kyler,Drunk,Win
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Jojo,Undertaker,Win
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Outsider,Kenny,Recluse,Win
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Jonah,Soldier,Win
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Minh,Slayer,Win
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Townsfolk,Jonathan,Chef,Win
+1755231017|Townsfolk|KevZ3742|Trouble Brewing,Demon,Kael,Imp,Loss
+1755233952|Demon|Michael|Trouble Brewing,Minion,KevZ3742,Spy,Win
+1755233952|Demon|Michael|Trouble Brewing,Townsfolk,Will,Monk,Loss
+1755233952|Demon|Michael|Trouble Brewing,Townsfolk,Kyler,Drunk,Loss
+1755233952|Demon|Michael|Trouble Brewing,Townsfolk,Jojo,Drunk,Loss
+1755233952|Demon|Michael|Trouble Brewing,Demon,Kenny,Imp,Win
+1755233952|Demon|Michael|Trouble Brewing,Outsider,Jonah,Drunk,Loss
+1755233952|Demon|Michael|Trouble Brewing,Outsider,Minh,Saint,Loss
+1755233952|Demon|Michael|Trouble Brewing,Townsfolk,Jonathan,Drunk,Loss
+1755233952|Demon|Michael|Trouble Brewing,Townsfolk,Kael,Empath,Loss
