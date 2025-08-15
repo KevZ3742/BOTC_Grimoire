@@ -5,7 +5,9 @@ import csv
 import os
 import time
 from scripts import scripts
+import types
 
+# Constants
 MATCH_HISTORY_FILE = "match_history.csv"
 
 MIN_PLAYERS = 5
@@ -35,6 +37,15 @@ role_distribution = {
     13: (9, 0, 3, 1),
     14: (9, 1, 3, 1),
     15: (9, 2, 3, 1),
+}
+
+STATUS_OPTIONS = {
+    # Format: {"status": {"bg": color, "fg": color}}
+    "Dead": {"bg": "#000000", "fg": "white"},
+    "Poisoned": {"bg": "#800080", "fg": "white"},
+    "Drunk": {"bg": "#006400", "fg": "white"},
+    "Mad": {"bg": "#FF69B4", "fg": "black"},
+    "Protected": {"bg": "#FFD700", "fg": "black"},
 }
 
 root = tk.Tk()
@@ -86,7 +97,7 @@ info_frame.grid(row=0, column=1, padx=10)
 create_prompt_label = ttk.Label(info_frame, text="Create rows first", foreground="gray", anchor="center")
 create_prompt_label.pack(fill='x', pady=20)
 
-bluff_frame = ttk.LabelFrame(main_frame, text="Bluff Roles for Imp")
+bluff_frame = ttk.LabelFrame(main_frame, text="Bluff Roles for Demon")
 bluff_frame.grid(row=0, column=2, padx=10)
 bluff_labels = [ttk.Label(bluff_frame, text=f"Bluff {i+1}: TBD", anchor="center") for i in range(3)]
 for lbl in bluff_labels:
@@ -101,9 +112,12 @@ def color_class_label(label, role_type):
     label.config(background=color, foreground=fg_color)
 
 def create_player_rows():
+    # Clear existing rows
     for widget in player_table_frame.winfo_children():
         widget.destroy()
     player_rows.clear()
+    
+    # Validate input
     try:
         num_players = int(player_count_var.get())
         num_travelers = int(traveler_count_var.get())
@@ -112,28 +126,171 @@ def create_player_rows():
         if num_players + num_travelers > MAX_PLAYERS:
             raise ValueError
     except ValueError:
-        messagebox.showerror("Invalid Input", "Players: 5–15, Travelers: 0–5, Total ≤ 20")
+        messagebox.showerror("Invalid Input", "Players: 5-15, Travelers: 0-5, Total ≤ 20")
         return
+    
     create_prompt_label.pack_forget()
-    headers = ["Class", "Username", "Role"]
+    
+    # Create column headers
+    headers = ["Class", "Username", "Role", "Status Tags"]
     for col, text in enumerate(headers):
-        ttk.Label(player_table_frame, text=text, font=('Arial', 10, 'bold')).grid(row=0, column=col, padx=5, pady=5)
+        header = ttk.Label(player_table_frame, 
+                         text=text, 
+                         font=('Arial', 10, 'bold'),
+                         borderwidth=1,
+                         relief="solid")
+        header.grid(row=0, column=col, padx=5, pady=5, sticky="nsew")
+    
+    # Configure column weights
+    for col in range(len(headers)):
+        player_table_frame.columnconfigure(col, weight=1)
+    
+    # Create player rows
     for i in range(num_players + num_travelers):
         is_traveler = i >= num_players
-        class_lbl = tk.Label(player_table_frame, text="Traveler" if is_traveler else "Resident", width=10)
-        class_lbl.grid(row=i+1, column=0, padx=5, pady=2)
+        
+        # Class Label
+        class_lbl = tk.Label(player_table_frame,
+                           text="Traveler" if is_traveler else "Resident",
+                           width=10,
+                           borderwidth=1,
+                           relief="solid")
+        class_lbl.grid(row=i+1, column=0, padx=5, pady=2, sticky="nsew")
+        
+        # Username Entry
         username_entry = ttk.Entry(player_table_frame)
-        username_entry.grid(row=i+1, column=1, padx=5, pady=2)
-        role_lbl = ttk.Label(player_table_frame, text="TBD")
-        role_lbl.grid(row=i+1, column=2, padx=5, pady=2)
+        username_entry.grid(row=i+1, column=1, padx=5, pady=2, sticky="nsew")
+        
+        # Role Label
+        role_lbl = ttk.Label(player_table_frame,
+                           text="TBD",
+                           borderwidth=1,
+                           relief="solid")
+        role_lbl.grid(row=i+1, column=2, padx=5, pady=2, sticky="nsew")
+        
+        # Status Tag Cell
+        tag_frame = tk.Frame(player_table_frame,
+               borderwidth=1,
+               relief="solid")
+        tag_frame.grid(row=i+1, column=3, padx=5, pady=2, sticky="nsew")
+        tag_frame.grid_propagate(True)
+
+        # Frame to hold colored squares
+        tag_squares_frame = tk.Frame(tag_frame)
+        tag_squares_frame.pack(expand=True, fill="both")
+
+        tag_label = tk.Label(tag_frame, text="", anchor="w", padx=0, pady=0)
+        tag_label.active_tags = set()
+
+        # Create a context object to hold our references
+        class StatusContext:
+            def __init__(self, label, frame, menu):
+                self.label = label
+                self.frame = frame
+                self.menu = menu
+                self.menu_indices = []
+                
+            def make_toggle_command(self, status):
+                def cmd():
+                    toggle_status_tag(self.label, status)
+                    self.update_tag_display()
+                    self.update_menu_checks()
+                return cmd
+                
+            def clear_command(self):
+                def cmd():
+                    clear_status_tags(self.label)
+                    self.update_tag_display()
+                    self.update_menu_checks()
+                return cmd
+                
+            def update_menu_checks(self):
+                for idx, status, color in self.menu_indices:
+                    checked = status in self.label.active_tags
+                    check = "✓ " if checked else ""
+                    self.menu.entryconfig(idx, label=f"{check}\u25A0 {status}", foreground=color)
+                    
+            def update_tag_display(self):
+                for widget in self.frame.winfo_children():
+                    widget.destroy()
+                
+                for status in self.label.active_tags:
+                    colors = STATUS_OPTIONS.get(status, {"bg": "#CCCCCC", "fg": "black"})
+                    square = tk.Label(
+                        self.frame,
+                        bg=colors["bg"],
+                        fg=colors["fg"],
+                        text=status,
+                        width=max(7, len(status)),
+                        height=1,
+                        relief="ridge",
+                        borderwidth=1,
+                        font=("Arial", 9, "bold")
+                    )
+                    square.pack(side="left", padx=2, pady=1)
+                    square.bind("<Button-3>", self.show_menu)
+                self.label.config(text="")
+                
+            def show_menu(self, event=None):
+                self.update_menu_checks()
+                self.menu.post(event.x_root, event.y_root)
+
+        # Create the context with our current widgets
+        context = StatusContext(tag_label, tag_squares_frame, tk.Menu(root, tearoff=0))
+
+        # Add status options to the menu
+        for idx, (status, colors) in enumerate(STATUS_OPTIONS.items()):
+            context.menu.add_command(
+                label=f"\u25A0 {status}",
+                command=context.make_toggle_command(status)
+            )
+            context.menu.entryconfig(idx, foreground=colors["bg"])
+            context.menu_indices.append((idx, status, colors["bg"]))
+
+        context.menu.add_separator()
+        context.menu.add_command(
+            label="Clear all statuses",
+            command=context.clear_command()
+        )
+
+        # Bind right-click to show menu
+        tag_frame.bind("<Button-3>", context.show_menu)
+        tag_squares_frame.bind("<Button-3>", context.show_menu)
+
+        # Visual feedback on hover
+        tag_frame.bind("<Enter>", lambda _: tag_frame.config(relief="groove"))
+        tag_frame.bind("<Leave>", lambda _: tag_frame.config(relief="solid"))
+
+        # Store the update method
+        tag_label.update_tag_display = context.update_tag_display
+
         player_rows.append({
             "username_entry": username_entry,
             "role_label": role_lbl,
             "class_label": class_lbl,
-            "is_traveler": is_traveler
+            "tag_label": tag_label,
+            "is_traveler": is_traveler,
+            "tag_squares_frame": tag_squares_frame
         })
-
 create_btn.config(command=create_player_rows)
+
+def toggle_status_tag(label, status):
+    if status in label.active_tags:
+        label.active_tags.remove(status)
+    else:
+        label.active_tags.add(status)
+    update_tag_display(label)
+
+def clear_status_tags(label):
+    label.active_tags.clear()
+    update_tag_display(label)
+
+def update_tag_display(label):
+    if not label.active_tags:
+        label.config(text="")
+        return
+    
+    label.config(text=", ".join(label.active_tags))
 
 # --- Generate Roles ---
 def generate_roles():
@@ -235,15 +392,13 @@ def generate_roles():
 ttk.Button(role_tab, text="Generate Roles", command=generate_roles).pack(pady=5)
 
 # --- Save and Reset ---
-def save_and_reset(winning_team):  # Renamed from 'winner' to 'winning_team' for clarity
+def save_and_reset(winning_team):
     global roles_generated
     
-    # Check if roles were generated
     if not roles_generated:
         messagebox.showerror("Roles Not Generated", "You must generate roles before ending the game.")
         return
     
-    # Confirm with the user
     team_members = "Townsfolk and Outsiders" if winning_team == "Townsfolk" else "Demons and Minions"
     confirm = messagebox.askyesno(
         "Confirm End Game",
@@ -253,12 +408,10 @@ def save_and_reset(winning_team):  # Renamed from 'winner' to 'winning_team' for
     if not confirm:
         return
     
-    # Validate Storyteller is required
     if not storyteller_username_var.get().strip():
         messagebox.showerror("Missing Storyteller", "Storyteller name is required before saving.")
         return
 
-    # Validate all usernames are non-empty and unique
     usernames = []
     for row in player_rows:
         uname = row['username_entry'].get().strip()
@@ -281,19 +434,27 @@ def save_and_reset(winning_team):  # Renamed from 'winner' to 'winning_team' for
         writer = csv.writer(f)
         for row in player_rows:
             role = row["role_label"].cget("text")
-            # If this is a Drunk role (stored as Drunk-XYZ), save just "Drunk"
             if hasattr(row["role_label"], 'drunk_fake_role'):
                 role = "Drunk"
+            
+            # Determine if this player's team won
+            player_class = row["class_label"].cget("text")
+            if player_class in ["Townsfolk", "Outsider"]:
+                player_won = winning_team == "Townsfolk"
+            else:  # Demon or Minion
+                player_won = winning_team == "Demon"
+            
             writer.writerow([
                 match_id,
-                row["class_label"].cget("text"),
+                player_class,
                 row["username_entry"].get().strip(),
-                role
+                role,
+                "Win" if player_won else "Loss"
             ])
 
     load_full_match_history()
     reset_all()
-    load_all_usernames()  # update autocomplete list with new users
+    load_all_usernames()
 
 def reset_all():
     global roles_generated
@@ -354,62 +515,64 @@ def load_full_match_history():
             
             if len(parts) == 4:  # New format
                 game_id, winner, storyteller, script = parts
-            elif len(parts) == 3:  # Old format
-                winner, storyteller, script = parts
-                game_id = "legacy"
             else:
                 continue  # Skip malformed entries
                 
             if match_id not in matches:
                 matches[match_id] = []
-            matches[match_id].append(r[1:])  # class, username, role
+            
+            # New format: match_id, class, username, role, result
+            if len(r) >= 5:  # Has result field
+                matches[match_id].append(r[1:5])  # class, username, role, result
+            else:  # Old format without result
+                matches[match_id].append(r[1:4] + ["Win" if is_team_winner(r[1], winner) else "Loss"])
 
     # Define colors
-    townsfolk_color = ROLE_COLORS["Townsfolk"]
-    demon_color = ROLE_COLORS["Demon"]
-    townsfolk_fg = "white"
-    demon_fg = "white"
+    townsfolk_win_color = "#00008B"  # Dark blue for town wins
+    demon_win_color = "#8B0000"     # Dark red for demon wins
+    win_color = "#90EE90"  # Light green for wins
+    loss_color = "#FFCCCB"  # Light red for losses
+    text_color = "black"    # Black text for all
 
     for match_id, entries in matches.items():
         parts = match_id.split("|")
-        if len(parts) == 4:
-            game_id, winner, storyteller, script = parts
-        else:
-            winner, storyteller, script = parts
-            game_id = "legacy"
+        game_id, winner, storyteller, script = parts
         
-        # Determine tag and colors based on winner
-        if winner == "Demon":
-            tag = "demon_win"
-            bg_color = demon_color
-            fg_color = demon_fg
-        else:  # Townsfolk win
-            tag = "townsfolk_win"
-            bg_color = townsfolk_color
-            fg_color = townsfolk_fg
-            
+        # Parent row uses dark team colors
+        parent_tag = "townsfolk_win" if winner == "Townsfolk" else "demon_win"
         parent = tree.insert(
             "", "end",
             text=f"Game {game_id} | Winner: {winner} | Storyteller: {storyteller} | Script: {script}",
             open=False,
-            tags=(tag,)
+            tags=(parent_tag,)
         )
         
-        # Apply colors to child entries too
         for entry in entries:
+            class_, username, role, result = entry
+            # Child rows use win/loss colors
+            tag = f"{result.lower()}"  # Just 'win' or 'loss' tag
             tree.insert(
                 parent, "end", 
-                values=tuple(entry),
+                values=(class_, username, role),
                 tags=(tag,)
             )
 
     # Configure tag styles
+    # Parent rows - dark team colors with white text
     tree.tag_configure("townsfolk_win", 
-                      background=townsfolk_color, 
-                      foreground=townsfolk_fg)
+                      background=townsfolk_win_color, 
+                      foreground="white")
     tree.tag_configure("demon_win", 
-                      background=demon_color, 
-                      foreground=demon_fg)
+                      background=demon_win_color, 
+                      foreground="white")
+    
+    # Child rows - light win/loss colors with black text
+    tree.tag_configure("win", 
+                      background=win_color, 
+                      foreground=text_color)
+    tree.tag_configure("loss", 
+                      background=loss_color, 
+                      foreground=text_color)
 
 load_full_match_history()
 
@@ -466,14 +629,16 @@ def load_all_usernames():
             match_id = r[0]
             parts = match_id.split("|")
             
-            # Handle both old and new formats
-            if len(parts) == 4:  # New format: game_id|winner|storyteller|script
+            if len(parts) == 4:  # New format
                 game_id, winner, storyteller, script = parts
-            elif len(parts) == 3:  # Old format: winner|storyteller|script
-                winner, storyteller, script = parts
-                game_id = str(int(time.time()))  # Generate a game_id for old entries
             else:
                 continue  # Skip malformed entries
+                
+            # New format: match_id, class, username, role, result
+            if len(r) >= 5:
+                result = r[4]
+            else:  # Old format without result
+                result = "Win" if is_team_winner(r[1], winner) else "Loss"
                 
             cls, username, role = r[1], r[2], r[3]
             all_usernames.add(username)
@@ -484,7 +649,8 @@ def load_all_usernames():
                 "script": script,
                 "class": cls,
                 "username": username,
-                "role": role
+                "role": role,
+                "result": result
             })
 
 def update_autocomplete_list(event=None):
@@ -520,14 +686,55 @@ def display_player_stats(username):
         role_stats_text.config(state="disabled")
         return
 
-    # Overall win rate (team-based)
-    wins = sum(1 for m in user_matches if is_team_winner(m["class"], m["winner"]))
+    # Overall win rate (using result field)
+    wins = sum(1 for m in user_matches if m["result"] == "Win")
     total = len(user_matches)
     rate = wins / total * 100
     winrate_label.config(text=f"Overall Win Rate for {username}: {rate:.2f}% ({wins}/{total})")
 
     # Update script-specific stats
     update_script_winrate(username)
+
+def update_script_winrate(username=None):
+    if username is None:
+        username = search_var.get()
+    selected_script = script_filter_var.get()
+    user_matches = [m for m in match_data if m["username"] == username]
+
+    if selected_script != "All":
+        user_matches = [m for m in user_matches if m["script"] == selected_script]
+
+    if not user_matches:
+        script_winrate_label.config(text="Win Rate for Selected Script: N/A")
+        role_stats_text.config(state="normal")
+        role_stats_text.delete(1.0, tk.END)
+        role_stats_text.insert(tk.END, "No matches for this script.")
+        role_stats_text.config(state="disabled")
+        return
+
+    # Win rate for selected script (using result field)
+    wins = sum(1 for m in user_matches if m["result"] == "Win")
+    total = len(user_matches)
+    rate = wins / total * 100
+    script_winrate_label.config(text=f"Win Rate for Selected Script: {rate:.2f}% ({wins}/{total})")
+
+    # Per-role win rate stats
+    role_stats = {}
+    for m in user_matches:
+        role = m["role"]
+        if role not in role_stats:
+            role_stats[role] = {"wins": 0, "total": 0}
+        role_stats[role]["total"] += 1
+        if m["result"] == "Win":
+            role_stats[role]["wins"] += 1
+
+    # Display role stats
+    role_stats_text.config(state="normal")
+    role_stats_text.delete(1.0, tk.END)
+    for role, stats in sorted(role_stats.items()):
+        role_winrate = (stats["wins"] / stats["total"]) * 100
+        role_stats_text.insert(tk.END, f"{role}: {role_winrate:.2f}% ({stats['wins']}/{stats['total']})\n")
+    role_stats_text.config(state="disabled")
 
 def update_script_winrate(username=None):
     if username is None:
