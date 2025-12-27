@@ -41,9 +41,32 @@ laissez_un_faire = {
     "Demon": ["Leviathan"]
 }
 
+no_greater_joy = {
+    "Townsfolk": [
+        "Clockmaker",
+        "Investigator",
+        "Empath",
+        "Chambermaid",
+        "Artist",
+        "Sage"
+    ],
+    "Outsider": [
+        "Drunk",
+        "Klutz"
+    ],
+    "Minion": [
+        "Scarlet Woman",
+        "Baron"
+    ],
+    "Demon": [
+        "Imp"
+    ]
+}
+
 scripts = {
     "Trouble Brewing": trouble_brewing,
     "Bad Moon Rising": bad_moon_rising,
     "Extension Cord": extension_cord,
-    "Laissez Un Faire": laissez_un_faire
+    "Laissez Un Faire": laissez_un_faire,
+    "No Greater Joy": no_greater_joy
 }

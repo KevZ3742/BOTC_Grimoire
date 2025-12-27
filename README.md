@@ -12,6 +12,8 @@ A companion tool for the social deduction game *Blood on the Clocktower*. This g
 
 - Trouble Brewing
 - Bad Moon Rising (Work in Progress)
+- Extension Cord
+- Laissez Un Faire (Teensyville)
 
 ## Usage
 

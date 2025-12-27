@@ -19,16 +19,22 @@ class RoleGenerator:
     def adjust_for_special_roles(townsfolk: int, outsiders: int, 
                                  minions: List[str], roles: dict) -> Tuple[int, int]:
         """Adjust distribution for special roles like Baron and Godfather"""
-        # Baron: +2 Outsiders, -2 Townsfolk
+        max_outsiders = len(roles["Outsider"])
+        
+        # Baron: +2 Outsiders, -2 Townsfolk (but capped by available outsiders)
         if "Baron" in minions:
-            townsfolk = max(0, townsfolk - 2)
-            outsiders += 2
+            # Try to add 2 outsiders, but cap at what's available
+            actual_add = min(2, max_outsiders - outsiders)
+            townsfolk = max(0, townsfolk - actual_add)
+            outsiders += actual_add
         
         # Godfather: 50% chance to swap 1 Townsfolk for 1 Outsider
         if "Godfather" in minions:
             if random.randint(0, 1) == 0:
-                townsfolk = max(0, townsfolk - 1)
-                outsiders += 1
+                # Try to add 1 outsider if possible
+                if outsiders < max_outsiders:
+                    townsfolk = max(0, townsfolk - 1)
+                    outsiders += 1
             else:
                 townsfolk += 1
                 outsiders = max(0, outsiders - 1)
