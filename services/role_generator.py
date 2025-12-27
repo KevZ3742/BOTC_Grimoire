@@ -98,6 +98,7 @@ class RoleGenerator:
         # Handle Drunk fake roles
         available_fake_roles = [r for r in script_roles["Townsfolk"] 
                                if r not in assigned_roles]
+        random.shuffle(available_fake_roles)  # FIX: Shuffle the list before popping
         
         for player in players:
             if player.role == "Drunk":
