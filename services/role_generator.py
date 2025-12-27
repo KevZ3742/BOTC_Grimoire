@@ -80,18 +80,27 @@ class RoleGenerator:
             demon_role = final_demons[0]
             role_pool.remove(demon_role)
             
-            # Shuffle the rest
+            # Shuffle the rest (this will be num_residents - 2 roles)
             random.shuffle(role_pool)
             
-            # Pick a random position for the Demon (not first or last to have neighbors)
-            demon_pos = random.randint(1, num_residents - 2)
+            # Pick a random position for the Demon (can be anywhere in circle)
+            demon_pos = random.randint(0, num_residents - 1)
             
-            # Insert Demon at chosen position
-            role_pool.insert(demon_pos, demon_role)
+            # Calculate neighbor positions (treating as circular)
+            # We want Marionette to be adjacent to Demon in final arrangement
+            left_neighbor = (demon_pos - 1) % num_residents
+            right_neighbor = (demon_pos + 1) % num_residents
             
-            # Insert Marionette next to Demon (randomly left or right)
-            marionette_offset = random.choice([-1, 1])
-            role_pool.insert(demon_pos + (1 if marionette_offset == 1 else 0), "Marionette")
+            # Randomly choose left or right neighbor
+            marionette_pos = random.choice([left_neighbor, right_neighbor])
+            
+            # Insert them in order: lower index first to avoid shifting issues
+            if demon_pos < marionette_pos:
+                role_pool.insert(demon_pos, demon_role)
+                role_pool.insert(marionette_pos, "Marionette")
+            else:
+                role_pool.insert(marionette_pos, "Marionette")
+                role_pool.insert(demon_pos, demon_role)
         else:
             # Normal shuffling if no Marionette
             random.shuffle(role_pool)
