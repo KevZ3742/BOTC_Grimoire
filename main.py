@@ -372,16 +372,13 @@ def generate_roles():
             row["class_label"].config(text="Traveler")
             color_class_label(row["class_label"], "Traveler")
 
-    all_townsfolk = [r for r in roles["Townsfolk"] if r != "Drunk"]
     assigned_roles = [row["role_label"].cget("text") for row in player_rows]
-
-    # remove any roles that are already assigned to real players
-    eligible_fake_roles = [r for r in all_townsfolk if r not in assigned_roles]
+    available_fake_roles = [r for r in roles["Townsfolk"] if r not in assigned_roles]
 
     for row in player_rows:
         if row["role_label"].cget("text") == "Drunk":
-            fake_role = random.choice(eligible_fake_roles) if eligible_fake_roles else "unknown"
-            row["role_label"].drunk_fake_role = fake_role
+            fake_role = available_fake_roles.pop() if available_fake_roles else "unknown"
+            row["role_label"].drunk_fake_role = fake_role  # Store the fake role separately
             row["role_label"].config(text=f"Drunk-{fake_role}")
 
     bluff_pool = [r for r in roles["Townsfolk"] + roles["Outsider"] if r not in assigned_roles]
