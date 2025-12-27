@@ -71,7 +71,30 @@ class RoleGenerator:
         
         # Create role pool for residents
         role_pool = final_townsfolk + final_outsiders + sampled_minions + final_demons
-        random.shuffle(role_pool)
+        
+        # Handle Marionette seating requirement
+        has_marionette = "Marionette" in sampled_minions
+        if has_marionette:
+            # Remove Marionette and Demon from pool temporarily
+            role_pool.remove("Marionette")
+            demon_role = final_demons[0]
+            role_pool.remove(demon_role)
+            
+            # Shuffle the rest
+            random.shuffle(role_pool)
+            
+            # Pick a random position for the Demon (not first or last to have neighbors)
+            demon_pos = random.randint(1, num_residents - 2)
+            
+            # Insert Demon at chosen position
+            role_pool.insert(demon_pos, demon_role)
+            
+            # Insert Marionette next to Demon (randomly left or right)
+            marionette_offset = random.choice([-1, 1])
+            role_pool.insert(demon_pos + (1 if marionette_offset == 1 else 0), "Marionette")
+        else:
+            # Normal shuffling if no Marionette
+            random.shuffle(role_pool)
         
         # Create traveler pool
         traveler_roles = script_roles.get("Traveler", [])[:]
@@ -85,7 +108,7 @@ class RoleGenerator:
             is_traveler = i >= num_residents
             
             if not is_traveler:
-                role = role_pool.pop()
+                role = role_pool.pop(0)  # Pop from front since we've arranged the order
                 player_class = RoleGenerator._get_role_class(role, script_roles)
             else:
                 role = traveler_roles.pop() if traveler_roles else "Traveler"

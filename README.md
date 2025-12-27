@@ -14,6 +14,8 @@ A companion tool for the social deduction game *Blood on the Clocktower*. This g
 - Bad Moon Rising (Work in Progress)
 - Extension Cord
 - Laissez Un Faire (Teensyville)
+- A Lleech Of Distrust (Teensyville)
+- Folie A Demone (Teensyville)
 
 ## Usage
 

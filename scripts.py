@@ -42,25 +42,24 @@ laissez_un_faire = {
 }
 
 no_greater_joy = {
-    "Townsfolk": [
-        "Clockmaker",
-        "Investigator",
-        "Empath",
-        "Chambermaid",
-        "Artist",
-        "Sage"
-    ],
-    "Outsider": [
-        "Drunk",
-        "Klutz"
-    ],
-    "Minion": [
-        "Scarlet Woman",
-        "Baron"
-    ],
-    "Demon": [
-        "Imp"
-    ]
+    "Townsfolk": ["Clockmaker", "Investigator", "Empath", "Chambermaid", "Artist", "Sage"],
+    "Outsider": ["Drunk", "Klutz"],
+    "Minion": ["Scarlet Woman", "Baron"],
+    "Demon": ["Imp"]
+}
+
+a_lleech_of_distrust = {
+    "Townsfolk": ["Pixie", "Undertaker", "Exorcist", "Fisherman", "Slayer", "Juggler"],
+    "Outsider": ["Lunatic", "Drunk"],
+    "Minion": ["Devil's Advocate", "Marionette"],
+    "Demon": ["Lleech"]
+}
+
+folie_a_demone = {
+    "Townsfolk": ["Chef", "Clockmaker", "Investigator", "Noble", "Alchemist", "Atheist"],
+    "Outsider": ["Recluse", "Heretic"],
+    "Minion": ["Fearmonger", "Evil Twin"],
+    "Demon": ["Imp", "Vortox"]
 }
 
 scripts = {
@@ -68,5 +67,6 @@ scripts = {
     "Bad Moon Rising": bad_moon_rising,
     "Extension Cord": extension_cord,
     "Laissez Un Faire": laissez_un_faire,
-    "No Greater Joy": no_greater_joy
+    "No Greater Joy": no_greater_joy,
+    "A Lleech of Distrust": a_lleech_of_distrust
 }
