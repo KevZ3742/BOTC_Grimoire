@@ -68,5 +68,6 @@ scripts = {
     "Extension Cord": extension_cord,
     "Laissez Un Faire": laissez_un_faire,
     "No Greater Joy": no_greater_joy,
-    "A Lleech of Distrust": a_lleech_of_distrust
+    "A Lleech of Distrust": a_lleech_of_distrust,
+    "Folie a Demone": folie_a_demone
 }
