@@ -154,6 +154,19 @@ class RoleGenerator:
                 player.drunk_fake_role = fake_role
                 player.role = f"Drunk-{fake_role}"
         
+        # Handle Evil Twin - mark a random good player as the twin
+        has_evil_twin = "Evil Twin" in sampled_minions
+        if has_evil_twin:
+            # Find all good players (Townsfolk or Outsider, not travelers)
+            good_players = [p for p in players 
+                          if not p.is_traveler and p.player_class in ["Townsfolk", "Outsider"]]
+            
+            if good_players:
+                # Select a random good player to be the Evil Twin's twin
+                twin_player = random.choice(good_players)
+                # Mark them by appending "-Evil Twin" to their role
+                twin_player.role = f"{twin_player.role}-Evil Twin"
+        
         # Generate bluff roles
         bluff_pool = [r for r in script_roles["Townsfolk"] + script_roles["Outsider"] 
                      if r not in assigned_roles]
