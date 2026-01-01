@@ -64,11 +64,21 @@ class RoleGenerator:
         # Sample final roles
         try:
             final_townsfolk = random.sample(script_roles["Townsfolk"], townsfolk)
-            final_outsiders = random.sample(script_roles["Outsider"], outsiders)
             final_demons = random.sample(script_roles["Demon"], demons)
+            final_outsiders = random.sample(script_roles["Outsider"], outsiders)
         except ValueError as e:
             raise ValueError(f"Not enough roles to sample: {e}")
         
+        # Check if Atheist was actually selected in THIS game
+        has_atheist = "Atheist" in final_townsfolk
+        
+        if has_atheist:
+            # Atheist game: replace all evil roles with good roles
+            return RoleGenerator._generate_atheist_game(
+                num_residents, num_travelers, script_roles, final_townsfolk, final_outsiders
+            )
+        
+        # Normal game generation continues...
         # Create role pool for residents
         role_pool = final_townsfolk + final_outsiders + sampled_minions + final_demons
         
@@ -136,7 +146,7 @@ class RoleGenerator:
         # Handle Drunk fake roles
         available_fake_roles = [r for r in script_roles["Townsfolk"] 
                                if r not in assigned_roles]
-        random.shuffle(available_fake_roles)  # FIX: Shuffle the list before popping
+        random.shuffle(available_fake_roles)  # Shuffle the list before popping
         
         for player in players:
             if player.role == "Drunk":
@@ -148,7 +158,114 @@ class RoleGenerator:
         bluff_pool = [r for r in script_roles["Townsfolk"] + script_roles["Outsider"] 
                      if r not in assigned_roles]
         random.shuffle(bluff_pool)
-        bluff_roles = [bluff_pool.pop() if bluff_pool else "TBD" for _ in range(3)]
+        bluff_roles = [bluff_pool.pop() if bluff_pool else "N/A" for _ in range(3)]
+        
+        return players, bluff_roles
+    
+    @staticmethod
+    def _generate_atheist_game(num_residents: int, num_travelers: int, 
+                               script_roles: dict, 
+                               already_sampled_townsfolk: List[str],
+                               already_sampled_outsiders: List[str]) -> Tuple[List[Player], List[str]]:
+        """
+        Generate an Atheist game where everyone is good (Townsfolk/Outsiders)
+        The Atheist role is already in already_sampled_townsfolk
+        """
+        # Start with what we already sampled
+        final_roles = already_sampled_townsfolk[:] + already_sampled_outsiders[:]
+        assigned_roles = final_roles[:]
+        
+        # We need to fill the remaining slots (demons + minions) with more good roles
+        townsfolk, outsiders, minions, demons = RoleGenerator.calculate_distribution(
+            num_residents, script_roles
+        )
+        
+        # Calculate how many more roles we need (to replace demons and minions)
+        additional_needed = minions + demons
+        
+        # Get available roles (excluding what's already assigned)
+        available_townsfolk = [r for r in script_roles["Townsfolk"] 
+                               if r not in assigned_roles]
+        available_outsiders = [r for r in script_roles["Outsider"] 
+                              if r not in assigned_roles]
+        
+        # Try to maintain roughly 2:1 townsfolk to outsiders ratio for the additional roles
+        target_additional_outsiders = min(additional_needed // 3, len(available_outsiders))
+        target_additional_townsfolk = additional_needed - target_additional_outsiders
+        
+        # Adjust if we don't have enough
+        if target_additional_townsfolk > len(available_townsfolk):
+            overflow = target_additional_townsfolk - len(available_townsfolk)
+            target_additional_townsfolk = len(available_townsfolk)
+            target_additional_outsiders = min(target_additional_outsiders + overflow, 
+                                             len(available_outsiders))
+        
+        if target_additional_outsiders > len(available_outsiders):
+            overflow = target_additional_outsiders - len(available_outsiders)
+            target_additional_outsiders = len(available_outsiders)
+            target_additional_townsfolk = min(target_additional_townsfolk + overflow, 
+                                             len(available_townsfolk))
+        
+        try:
+            # Sample additional roles
+            if target_additional_townsfolk > 0:
+                extra_townsfolk = random.sample(available_townsfolk, target_additional_townsfolk)
+                final_roles.extend(extra_townsfolk)
+                assigned_roles.extend(extra_townsfolk)
+            
+            if target_additional_outsiders > 0:
+                extra_outsiders = random.sample(available_outsiders, target_additional_outsiders)
+                final_roles.extend(extra_outsiders)
+                assigned_roles.extend(extra_outsiders)
+        except ValueError as e:
+            raise ValueError(f"Not enough good roles for Atheist game: {e}")
+        
+        # Shuffle the role pool
+        random.shuffle(final_roles)
+        
+        # Create traveler pool
+        traveler_roles = script_roles.get("Traveler", [])[:]
+        random.shuffle(traveler_roles)
+        
+        # Assign roles to players
+        players = []
+        
+        for i in range(num_residents + num_travelers):
+            is_traveler = i >= num_residents
+            
+            if not is_traveler:
+                role = final_roles.pop(0)
+                player_class = RoleGenerator._get_role_class(role, script_roles)
+            else:
+                role = traveler_roles.pop() if traveler_roles else "Traveler"
+                player_class = "Traveler"
+            
+            player = Player(
+                username="",
+                role=role,
+                player_class=player_class,
+                is_traveler=is_traveler
+            )
+            
+            players.append(player)
+        
+        # Handle Drunk fake roles (if any Drunks in the game)
+        available_fake_roles = [r for r in script_roles["Townsfolk"] 
+                               if r not in assigned_roles]
+        random.shuffle(available_fake_roles)
+        
+        for player in players:
+            if player.role == "Drunk":
+                fake_role = available_fake_roles.pop() if available_fake_roles else "unknown"
+                player.drunk_fake_role = fake_role
+                player.role = f"Drunk-{fake_role}"
+        
+        # Generate bluff roles - in Atheist game, there are no evil players
+        # So bluffs might not have many options or might be N/A
+        bluff_pool = [r for r in script_roles["Townsfolk"] + script_roles["Outsider"] 
+                     if r not in assigned_roles]
+        random.shuffle(bluff_pool)
+        bluff_roles = [bluff_pool.pop() if bluff_pool else "N/A" for _ in range(3)]
         
         return players, bluff_roles
     
