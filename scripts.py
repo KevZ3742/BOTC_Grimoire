@@ -23,6 +23,38 @@ bad_moon_rising = {
     "Traveler": ["Scapegoat", "Gunslinger", "Beggar", "Bureaucrat", "Thief"]
 }
 
+sects_and_violets = {
+    "Townsfolk": [
+        "Clockmaker", "Dreamer", "Snake Charmer", "Mathematician", "Flowergirl", "Town Crier",
+        "Oracle", "Savant", "Seamstress", "Philosopher", "Artist", "Juggler", "Sage"
+    ],
+    "Outsider": [
+        "Barber", "Klutz", "Mutant", "Sweetheart"
+    ],
+    "Minion": [
+        "Cerenovus", "Evil Twin", "Pit-Hag", "Witch"
+    ],
+    "Demon": [
+        "Fang Gu", "No Dashii", "Vigormortis", "Vortox"
+    ]
+}
+
+quick_maths = {
+    "Townsfolk": [
+        "Noble", "Shugenja", "Pixie", "High Priestess", "General", "Dreamer", "Savant",
+        "Alsahair", "Nightwatchman", "Seamstress", "Philosopher", "Fisherman", "Juggler"
+    ],
+    "Outsider": [
+        "Ogre", "Politician", "Snitch", "Puzzlemaster"
+    ],
+    "Minion": [
+        "Spy", "Xaan", "Marionette", "Boffin"
+    ],
+    "Demon": [
+        "Riot"
+    ]
+}
+
 extension_cord = {
     "Townsfolk": [
         "Investigator", "Pixie", "Empath", "Dreamer", "Mathematician",
@@ -65,6 +97,8 @@ folie_a_demone = {
 scripts = {
     "Trouble Brewing": trouble_brewing,
     "Bad Moon Rising": bad_moon_rising,
+    "Sects and Violets": sects_and_violets,
+    "Quick Maths": quick_maths,
     "Extension Cord": extension_cord,
     "Laissez Un Faire": laissez_un_faire,
     "No Greater Joy": no_greater_joy,
